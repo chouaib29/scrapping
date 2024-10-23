@@ -33,7 +33,7 @@ def uncheck_button_fct():
     try:
 
         first_cell = WebDriverWait(driver, 20).until(
-                EC.element_to_be_clickable((By.CSS_SELECTOR, 'td:first-child'))
+                EC.element_to_be_clickable((By.CSS_SELECTOR, 'body > div:nth-child(7) > div:nth-child(2) > div > div:nth-child(3) > div > div > div:nth-child(2) > div > div:nth-child(12) > div > div > div > div > table > tbody:nth-child(3) > tr.MGLFIQ-jd-e.MGLFIQ-jd-D > td.MGLFIQ-jd-a.MGLFIQ-jd-f.MGLFIQ-jd-g.MGLFIQ-jd-E.MGLFIQ-jd-b > div > div'))
             )
         first_cell.click()
     except Exception as e :
@@ -51,23 +51,32 @@ def toggle_play_pause():
 
 # Fonction pour récupérer les informations
 def retrieve_position_data():
-    processed_names = set()  # Utiliser un ensemble pour stocker les noms déjà récupérés
+    processed_names = set()  
     competitors = competitors_table.find_elements(By.TAG_NAME, "tr")
 
-    # Récupérer les lignes du tableau
     for i in range(len(competitors)) :
         try:
-            # Accéder à la première cellule de la ligne
-            first_cell = competitors[i].find_element(By.CSS_SELECTOR, 'td:first-child')
-            
-            # Afficher la longueur du texte dans la cellule pour vérifier
-            first_cell_text = first_cell.text
-            print(f"Texte de la première cellule : {first_cell_text}")
-            
-            # Cliquer sur la première cellule
-            first_cell.click()
-            print(f"Cellule de la ligne {i+1} cliquée avec succès.")
+            first_cell = WebDriverWait(driver, 10).until(
+                EC.visibility_of(competitors[i].find_element(By.CSS_SELECTOR, 'td:first-child'))
+            )
+            print(f"Contenu de competitors à la ligne {i + 1} : {first_cell.get_attribute('outerHTML')}")
 
+            first_div = WebDriverWait(driver, 10).until(
+                EC.visibility_of(first_cell(By.CSS_SELECTOR, 'td:first-child > div'))
+            )
+            print(f"*************{i + 1} : {first_div.get_attribute('outerHTML')}")
+
+            if first_div.is_displayed():
+                driver.execute_script("arguments[0].click();", first_div)
+                print(f"Div de la ligne {i + 1} cliqué avec succès.")
+                time.sleep(2)
+
+                driver.execute_script("arguments[0].click();", first_div)
+                print(f"Div de la ligne {i + 1} décoché avec succès.")
+            else:
+                print(f"L'élément n'est pas visible à la ligne {i + 1}.")
+
+ 
         except Exception as e:
             print(f"Erreur lors de l'accès ou du clic sur la cellule de la ligne {i+1} : {e}")
 
@@ -90,8 +99,8 @@ def retrieve_position_data():
             time.sleep(2)
 
             # Attendre que le canvas soit visible et cliquable
-            WebDriverWait(driver, 20).until(EC.visibility_of(filtered_canvas_elements[0]))
-            WebDriverWait(driver, 20).until(EC.element_to_be_clickable(filtered_canvas_elements[0]))
+            WebDriverWait(driver, 10).until(EC.visibility_of(filtered_canvas_elements[0]))
+            WebDriverWait(driver, 10).until(EC.element_to_be_clickable(filtered_canvas_elements[0]))
             print("cannva visible ")
 
             # Simuler un clic sur ce canvas avec ActionChains
