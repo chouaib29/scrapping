@@ -33,11 +33,29 @@ def uncheck_button_fct():
     try:
 
         first_cell = WebDriverWait(driver, 20).until(
-                EC.element_to_be_clickable((By.CSS_SELECTOR, 'td:first-child'))
+                EC.element_to_be_clickable((By.CSS_SELECTOR, 'body > div:nth-child(7) > div:nth-child(2) > div > div:nth-child(3) > div > div > div:nth-child(2) > div > div:nth-child(12) > div > div > div > div > table > tbody:nth-child(3) > tr.MGLFIQ-jd-e.MGLFIQ-jd-D > td.MGLFIQ-jd-a.MGLFIQ-jd-f.MGLFIQ-jd-z.MGLFIQ-jd-g.MGLFIQ-jd-E.MGLFIQ-jd-b > div > div'))
             )
         first_cell.click()
     except Exception as e :
         print(f"Erreur lors du clic sur uncheck : {e}")
+def uncheck_button_fct(index):
+    try:
+        # Récupérer la ligne de la table juste avant d'interagir avec elle
+        competitors = competitors_table.find_elements(By.TAG_NAME, "tr")
+        element = competitors[index].find_element(By.CSS_SELECTOR, 'td.MGLFIQ-jd-a > div > div')  # Récupérer l'élément spécifique
+
+        # Attendre que l'élément soit cliquable
+        WebDriverWait(driver, 10).until(EC.element_to_be_clickable(element))
+
+        # Désélectionner l'élément en le cliquant à nouveau si nécessaire
+        actions = ActionChains(driver)
+        actions.move_to_element(element).click().perform()
+        print(f"Élément de la ligne {index + 1} a été désélectionné.")
+
+    except Exception as e:
+        print(f"Erreur lors de la désélection de l'élément de la ligne {index + 1} : {e}")
+
+
 
 # Fonction pour cliquer sur le bouton play/pause
 def toggle_play_pause():
@@ -51,28 +69,28 @@ def toggle_play_pause():
 
 # Fonction pour récupérer les informations
 def retrieve_position_data():
-    processed_names = set()  # Utiliser un ensemble pour stocker les noms déjà récupérés
+    processed_names = set()  
     competitors = competitors_table.find_elements(By.TAG_NAME, "tr")
+    # Récupérer la date affichée
+    element_date = driver.find_element(By.CSS_SELECTOR, ".timeLabel")
+    date_text = element_date.text
+    print(f"Date récupérée : {date_text}")
+    time.sleep(2)
 
-    # Récupérer les lignes du tableau
-    for i in range(len(competitors)) :
+    for i in range(len(competitors)):
         try:
-            # Accéder à la première cellule de la ligne
-            first_cell = competitors[i].find_element(By.CSS_SELECTOR, 'td:first-child')
-            
-            # Afficher la longueur du texte dans la cellule pour vérifier
-            first_cell_text = first_cell.text
-            print(f"Texte de la première cellule : {first_cell_text}")
-            
-            # Cliquer sur la première cellule
-            first_cell.click()
-            print(f"Cellule de la ligne {i+1} cliquée avec succès.")
+            # Récupérer dynamiquement l'élément à chaque itération pour éviter l'erreur "stale element reference"
+            competitors = competitors_table.find_elements(By.TAG_NAME, "tr")  # Réinitialisation à chaque itération
+            first_div = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable(competitors[i].find_element(By.CSS_SELECTOR, 'td.MGLFIQ-jd-a > div > div'))
+            )
+            first_div.click()
 
         except Exception as e:
-            print(f"Erreur lors de l'accès ou du clic sur la cellule de la ligne {i+1} : {e}")
+            print(f"Erreur lors de l'accès ou du clic sur la cellule de la ligne {i + 1} : {str(e)}")
+            continue  # Si une erreur survient, passer à la ligne suivante
 
-        
-        # Étape 3 : Récupérer tous les <canvas> dans le div spécifique
+        # Récupérer les <canvas> après avoir cliqué sur l'élément
         canvas_elements = driver.find_elements(By.CSS_SELECTOR, '#googleMapsArea > div > div.gm-style > div:nth-child(1) > div:nth-child(2) > div > div:nth-child(3) canvas')
         print(f"Nombre de canvas trouvés : {len(canvas_elements)}")
 
@@ -82,25 +100,19 @@ def retrieve_position_data():
             if canvas.get_attribute("width") == "37" and canvas.get_attribute("height") == "38"
         ]
         print(f"Nombre de canvas sans 'title' ou avec un 'title' vide : {len(filtered_canvas_elements)}")
+
         if filtered_canvas_elements:
-            # Récupérer la date affichée
-            element_date = driver.find_element(By.CSS_SELECTOR, ".timeLabel")
-            date_text = element_date.text
-            print(f"Date récupérée : {date_text}")
-            time.sleep(2)
-
-            # Attendre que le canvas soit visible et cliquable
-            WebDriverWait(driver, 20).until(EC.visibility_of(filtered_canvas_elements[0]))
-            WebDriverWait(driver, 20).until(EC.element_to_be_clickable(filtered_canvas_elements[0]))
-            print("cannva visible ")
-
-            # Simuler un clic sur ce canvas avec ActionChains
-            actions = ActionChains(driver)
-            actions.move_to_element(filtered_canvas_elements[0]).click().perform()
-            print("clic sur canva")
-
             try:
-                # Récupérer les informations du nom et de la direction
+                # Vérifier que le canvas est visible et cliquable
+                WebDriverWait(driver, 10).until(EC.visibility_of(filtered_canvas_elements[0]))
+                WebDriverWait(driver, 10).until(EC.element_to_be_clickable(filtered_canvas_elements[0]))
+
+                # Simuler un clic sur le canvas
+                actions = ActionChains(driver)
+                actions.move_to_element(filtered_canvas_elements[0]).click().perform()
+                print("Clic sur le canvas")
+
+                # Récupérer les informations après le clic
                 name = driver.find_element(By.CSS_SELECTOR, "#googleMapsArea > div > div.gm-style > div:nth-child(1) > div:nth-child(2) > div > div:nth-child(4) > div > div > div > div.gm-style-iw.gm-style-iw-c > div.gm-style-iw-d > div > table > tbody > tr:nth-child(1) > td > div > div:nth-child(2)").text
                 voile = driver.find_element(By.CSS_SELECTOR, "#googleMapsArea > div > div.gm-style > div:nth-child(1) > div:nth-child(2) > div > div:nth-child(4) > div > div > div > div.gm-style-iw.gm-style-iw-c > div.gm-style-iw-d > div > table > tbody > tr:nth-child(2) > td > div > div:nth-child(2)").text
                 place = driver.find_element(By.CSS_SELECTOR, "#googleMapsArea > div > div.gm-style > div:nth-child(1) > div:nth-child(2) > div > div:nth-child(4) > div > div > div > div.gm-style-iw.gm-style-iw-c > div.gm-style-iw-d > div > table > tbody > tr:nth-child(3) > td > div > div:nth-child(2)").text
@@ -116,19 +128,18 @@ def retrieve_position_data():
 
                     # Sauvegarder les informations dans un fichier
                     with open(f"{name}.txt", "a") as f:
-                        f.write(f"time : {date_text}, direction: {direction}, voile: {voile}, place, {vitesse} ,angle: {angle} ,position_DMS: {position_DMS}, position_Decimal: {position_Decimal} \n")
+                        f.write(f"time : {date_text}, direction: {direction}, voile: {voile}, place: {place}, vitesse: {vitesse}, angle: {angle}, position_DMS: {position_DMS}, position_Decimal: {position_Decimal}\n")
 
                     processed_names.add(name)  # Ajouter le nom à l'ensemble pour éviter les doublons
-                
+
                 time.sleep(2)
                 cancel_button_fct()
                 time.sleep(2)
-                uncheck_button_fct()
-                time.sleep(2)
-
 
             except Exception as e:
-                print(f"Erreur lors de la recuperation des données : {e}")
+                print(f"Erreur lors de la récupération des données : {e}")
+        # Désélectionner l'élément après utilisation
+        uncheck_button_fct(i)
 
 
 # Étape 1 : Clique sur le bouton "Plus d'options"
