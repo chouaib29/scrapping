@@ -51,7 +51,6 @@ def retrieve_position_data():
     canvas_elements = driver.find_elements(By.CSS_SELECTOR, '#googleMapsArea > div > div.gm-style > div:nth-child(1) > div:nth-child(2) > div > div:nth-child(3) canvas')
     print(f"Nombre de canvas trouvés : {len(canvas_elements)}")
 
-    # Filtrer les <canvas> qui n'ont pas d'attribut 'title' ou dont le titre est vide
     filtered_canvas_elements = [
         canvas for canvas in canvas_elements
         if canvas.get_attribute("width") == "28" and canvas.get_attribute("height") == "28"
@@ -98,7 +97,7 @@ if not appeareDate_clicked:
         )
         appeareDate.click()
         driver.execute_script("arguments[0].onclick = function() { return false; }", appeareDate)
-        appeareDate_clicked = True  # Marquer le bouton comme cliqué une fois
+        appeareDate_clicked = True
         print("Bouton 'TimePanel-ShowExtended' cliqué.")
     except Exception as e:
         print(f"Erreur lors du clic sur le bouton : {e}")
