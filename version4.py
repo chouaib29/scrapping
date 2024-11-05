@@ -22,7 +22,7 @@ time.sleep(5)
 
 def cancel_button_fct():
     try:
-        cancel_button = WebDriverWait(driver, 20).until(
+        cancel_button = WebDriverWait(driver, 10).until(
                 EC.element_to_be_clickable((By.CLASS_NAME, 'gm-ui-hover-effect'))
             )
         cancel_button.click()
@@ -49,7 +49,7 @@ def uncheck_button_fct(index):
 # Fonction pour cliquer sur le bouton play/pause
 def toggle_play_pause():
     try:
-        play_pause_button = WebDriverWait(driver, 20).until(
+        play_pause_button = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.CLASS_NAME, 'playPauseButton'))
         )
         play_pause_button.click()
@@ -63,7 +63,7 @@ def retrieve_position_data():
     element_date = driver.find_element(By.CSS_SELECTOR, ".timeLabel")
     date_text = element_date.text
     print(f"Date récupérée : {date_text}")
-    time.sleep(2)
+    time.sleep(1)
 
     for i in range(len(competitors)):
         try:
@@ -79,7 +79,6 @@ def retrieve_position_data():
             continue  
 
         canvas_elements = driver.find_elements(By.CSS_SELECTOR, '#googleMapsArea > div > div.gm-style > div:nth-child(1) > div:nth-child(2) > div > div:nth-child(3) canvas')
-        print(f"Nombre de canvas trouvés : {len(canvas_elements)}")
 
         # Filtrer les <canvas> qui n'ont pas d'attribut 'title' ou dont le titre est vide
         filtered_canvas_elements = [
@@ -90,15 +89,14 @@ def retrieve_position_data():
 
         if filtered_canvas_elements:
             try:
-                # Vérifier que le canvas est visible et cliquable
+                # Vérifier que le canvas(bateau) est visible et cliquable
                 WebDriverWait(driver, 10).until(EC.visibility_of(filtered_canvas_elements[0]))
                 WebDriverWait(driver, 10).until(EC.element_to_be_clickable(filtered_canvas_elements[0]))
 
                 # Simuler un clic sur le canvas
                 actions = ActionChains(driver)
                 actions.move_to_element(filtered_canvas_elements[0]).click().perform()
-                print("Clic sur le canvas")
-
+                #recuperer les données voulu
                 name = driver.find_element(By.CSS_SELECTOR, "#googleMapsArea > div > div.gm-style > div:nth-child(1) > div:nth-child(2) > div > div:nth-child(4) > div > div > div > div.gm-style-iw.gm-style-iw-c > div.gm-style-iw-d > div > table > tbody > tr:nth-child(1) > td > div > div:nth-child(2)").text
                 voile = driver.find_element(By.CSS_SELECTOR, "#googleMapsArea > div > div.gm-style > div:nth-child(1) > div:nth-child(2) > div > div:nth-child(4) > div > div > div > div.gm-style-iw.gm-style-iw-c > div.gm-style-iw-d > div > table > tbody > tr:nth-child(2) > td > div > div:nth-child(2)").text
                 place = driver.find_element(By.CSS_SELECTOR, "#googleMapsArea > div > div.gm-style > div:nth-child(1) > div:nth-child(2) > div > div:nth-child(4) > div > div > div > div.gm-style-iw.gm-style-iw-c > div.gm-style-iw-d > div > table > tbody > tr:nth-child(3) > td > div > div:nth-child(2)").text
@@ -116,9 +114,7 @@ def retrieve_position_data():
 
                     processed_names.add(name)  
 
-                time.sleep(2)
                 cancel_button_fct()
-                time.sleep(2)
 
             except Exception as e:
                 print(f"Erreur lors de la récupération des données : {e}")
@@ -126,41 +122,31 @@ def retrieve_position_data():
         uncheck_button_fct(i)
 
 
-# Étape 1 : Clique sur le bouton "Plus d'options"
+# Clique sur le bouton "Plus d'options"
 more_options_button = WebDriverWait(driver, 20).until(
     EC.element_to_be_clickable((By.CSS_SELECTOR, '[selenium-id="moreOptionsButton"]'))
 )
 more_options_button.click()
-print("Bouton 'Plus d'options' cliqué avec succès.")
 
-time.sleep(2)
-
-# Étape 2 : Clique sur le bouton "settings"
+# Clique sur le bouton "settings"
 settings_button = WebDriverWait(driver, 20).until(
     EC.element_to_be_clickable((By.CSS_SELECTOR, '[selenium-id="raceMapSettingsButton"]'))
 )
 settings_button.click()
-print("Bouton 'settings' cliqué avec succès.")
 
-time.sleep(2)
-
-# Étape 3 : Clique sur le bouton "checkBox"
+# Clique sur le bouton "checkBox"
 checkBox_button = WebDriverWait(driver, 20).until(
     EC.element_to_be_clickable((By.CSS_SELECTOR, '[selenium-id="showOnlySelectedCompetitorsCheckBox-input"]'))
 )
 checkBox_button.click()
-print("Bouton 'checkBox' cliqué avec succès.")
 
-time.sleep(2)
 
-# Étape 4 : Clique sur le bouton "done"
+# Clique sur le bouton "done"
 done_button = WebDriverWait(driver, 20).until(
     EC.element_to_be_clickable((By.CSS_SELECTOR, '[selenium-id="OkButton"]'))
 )
 done_button.click()
-print("Bouton 'done_button' cliqué avec succès.")
 
-time.sleep(2)
 
 # Gestion du bouton "TimePanel-ShowExtended"
 appeareDate_clicked = False
@@ -172,18 +158,16 @@ if not appeareDate_clicked:
         appeareDate.click()
         driver.execute_script("arguments[0].onclick = function() { return false; }", appeareDate)
         appeareDate_clicked = True 
-        print("Bouton 'TimePanel-ShowExtended' cliqué.")
     except Exception as e:
-        print(f"Erreur lors du clic sur le bouton : {e}")
-
-
+        print(f"Erreur lors du clic sur le bouton afficher le temp : {e}")
 
 element = driver.find_element(By.CSS_SELECTOR, "body > div:nth-child(7) > div:nth-child(2) > div > div:nth-child(2) > div > div > div > div > div:nth-child(1) > div.timePanelSlider > div")
 sub_element = element.find_element(By.CSS_SELECTOR,"body > div:nth-child(7) > div:nth-child(2) > div > div:nth-child(2) > div > div > div > div > div:nth-child(1) > div.timePanelSlider > div > div.gwt-SliderBar-line")
 size = sub_element.size
 w = size['width']
 action = ActionChains(driver)
-action.move_to_element_with_offset(sub_element, -1*w/2 + 80, 0).click().perform()
+# placer le curseur sur la position voulu dans le timeLine
+action.move_to_element_with_offset(sub_element, -1*w/2 + 281, 0).click().perform()
 
 # Attendre que le tableau des concurrents soit présent
 competitors_table = WebDriverWait(driver, 10).until(
@@ -192,10 +176,8 @@ competitors_table = WebDriverWait(driver, 10).until(
 
 for _ in range(3030):  
     toggle_play_pause()  
-    time.sleep(1) 
     retrieve_position_data()  
     time.sleep(1)  
     toggle_play_pause() 
-    time.sleep(1) 
 
 driver.quit()
