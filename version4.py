@@ -167,7 +167,7 @@ size = sub_element.size
 w = size['width']
 action = ActionChains(driver)
 # placer le curseur sur la position voulu dans le timeLine
-action.move_to_element_with_offset(sub_element, -1*w/2 + 281, 0).click().perform()
+action.move_to_element_with_offset(sub_element, -1*w/2 + 282, 0).click().perform()
 
 # Attendre que le tableau des concurrents soit présent
 competitors_table = WebDriverWait(driver, 10).until(
@@ -176,8 +176,10 @@ competitors_table = WebDriverWait(driver, 10).until(
 
 for _ in range(3030):  
     toggle_play_pause()  
-    retrieve_position_data()  
     time.sleep(1)  
+    retrieve_position_data()  
+    time.sleep(2)  
     toggle_play_pause() 
+    time.sleep(1) 
 
 driver.quit()
