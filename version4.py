@@ -77,10 +77,11 @@ def retrieve_position_data():
         except Exception as e:
             print(f"Erreur lors de l'accès ou du clic sur la cellule de la ligne {i + 1} : {str(e)}")
             continue  
-
+        time.sleep(1)
         canvas_elements = driver.find_elements(By.CSS_SELECTOR, '#googleMapsArea > div > div.gm-style > div:nth-child(1) > div:nth-child(2) > div > div:nth-child(3) canvas')
+        print(f"Nombre de canvas sans 'title' ou avec un 'title' vide : {len(canvas_elements)}")
 
-        # Filtrer les <canvas> qui n'ont pas d'attribut 'title' ou dont le titre est vide
+        # Filtrer les <canvas> par width et height pour recuperer juste les canvas qui represnetent le bateau
         filtered_canvas_elements = [
             canvas for canvas in canvas_elements
             if canvas.get_attribute("width") == "37" and canvas.get_attribute("height") == "38"
@@ -173,7 +174,7 @@ action.move_to_element_with_offset(sub_element, -1*w/2 + 282, 0).click().perform
 competitors_table = WebDriverWait(driver, 10).until(
     EC.presence_of_element_located((By.CSS_SELECTOR, 'body > div:nth-child(7) > div:nth-child(2) > div > div:nth-child(3) > div > div > div:nth-child(2) > div > div:nth-child(12) > div > div > div > div > table > tbody:nth-child(3)'))
 )
-
+#boucler sur la duré de la regate (50min) avec 30 sec avant leur debut  
 for _ in range(3030):  
     toggle_play_pause()  
     time.sleep(1)  
