@@ -10,11 +10,10 @@ chrome_options = Options()
 chrome_options.add_argument('--ignore-certificate-errors')
 chrome_options.add_argument('--ignore-ssl-errors=yes')  
 chrome_options.add_argument('--allow-insecure-localhost')  
-
+chrome_options.add_argument('--headless')  
+chrome_options.add_argument('--window-size= 12000,1080')  
 driver = webdriver.Chrome(options=chrome_options)
 
-driver = webdriver.Chrome()  
-driver.set_window_size(12000, 5000)
 driver.get('https://www.sapsailing.com/gwt/RaceBoard.html?regattaName=OSG2024TEV2023+-+Men%27s+Dinghy&raceName=ILCA+7+-+R1&leaderboardName=OSG2024TEV2023+-+Men%27s+Dinghy&leaderboardGroupId=83eb5c2a-d3ab-4e22-8422-1e4ab154ed34&eventId=b8220cee-9ec7-4640-b8d8-f40e079456d5&mode=PLAYER')
 
 time.sleep(5)
@@ -39,7 +38,6 @@ def uncheck_button_fct(index):
         # Désélectionner l'élément en le cliquant à nouveau si nécessaire
         actions = ActionChains(driver)
         actions.move_to_element(element).click().perform()
-        print(f"Élément de la ligne {index + 1} a été désélectionné.")
 
     except Exception as e:
         print(f"Erreur lors de la désélection de l'élément de la ligne {index + 1} : {e}")
@@ -79,14 +77,13 @@ def retrieve_position_data():
             continue  
         time.sleep(1)
         canvas_elements = driver.find_elements(By.CSS_SELECTOR, '#googleMapsArea > div > div.gm-style > div:nth-child(1) > div:nth-child(2) > div > div:nth-child(3) canvas')
-        print(f"Nombre de canvas sans 'title' ou avec un 'title' vide : {len(canvas_elements)}")
 
         # Filtrer les <canvas> par width et height pour recuperer juste les canvas qui represnetent le bateau
         filtered_canvas_elements = [
             canvas for canvas in canvas_elements
-            if canvas.get_attribute("width") == "37" and canvas.get_attribute("height") == "38"
+            if canvas.get_attribute("width") == "37" and canvas.get_attribute("height") == "38" 
         ]
-        print(f"Nombre de canvas sans 'title' ou avec un 'title' vide : {len(filtered_canvas_elements)}")
+        print(f"Nombre de canvas bateau : {len(filtered_canvas_elements)}")
 
         if filtered_canvas_elements:
             try:
@@ -168,7 +165,7 @@ size = sub_element.size
 w = size['width']
 action = ActionChains(driver)
 # placer le curseur sur la position voulu dans le timeLine
-action.move_to_element_with_offset(sub_element, -1*w/2 + 282, 0).click().perform()
+action.move_to_element_with_offset(sub_element, -1*w/2 + 2090, 0).click().perform()
 
 # Attendre que le tableau des concurrents soit présent
 competitors_table = WebDriverWait(driver, 10).until(
