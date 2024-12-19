@@ -8,40 +8,39 @@ from selenium.webdriver.chrome.options import Options
 
 chrome_options = Options()
 chrome_options.add_argument('--ignore-certificate-errors')
-chrome_options.add_argument('--ignore-ssl-errors=yes')  # Option supplémentaire pour ignorer les erreurs SSL
-chrome_options.add_argument('--allow-insecure-localhost')  # Permet les certificats invalides sur localhost
+chrome_options.add_argument('--ignore-ssl-errors=yes') 
+chrome_options.add_argument('--allow-insecure-localhost') 
 driver = webdriver.Chrome(options=chrome_options)
-driver = webdriver.Chrome()  # Optional argument, if not specified will search path.
+driver = webdriver.Chrome() 
 driver.set_window_size(12000, 5000)
 driver.get('https://www.sapsailing.com/gwt/RaceBoard.html?regattaName=OSG2024TEV2023+-+Men%27s+Dinghy&raceName=ILCA+7+-+R2&leaderboardName=OSG2024TEV2023+-+Men%27s+Dinghy&leaderboardGroupId=83eb5c2a-d3ab-4e22-8422-1e4ab154ed34&eventId=b8220cee-9ec7-4640-b8d8-f40e079456d5&rm.buoyZoneRadiusInMeters=12.57&rm.zoomSettings.typesToConsiderOnZoom.removed=BUOYS&lb.raceDetailsToShow.removed=RACE_DISPLAY_BOATS&lb.overallDetailsToShow.removed=REGATTA_RANK&lb.delayBetweenAutoAdvancesInMilliseconds=1000&t=2896&autoExpandPreSelectedRace=true')
 
 time.sleep(5)
 
+def cancel_button_fct():
+    try:
+        cancel_button = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.CLASS_NAME, 'gm-ui-hover-effect'))
+            )
+        cancel_button.click()
+    except Exception as e :
+        print(f"Erreur lors du clic sur Cancel : {e}")
 
 def uncheck_button_fct(index):
     try:
         competitors = competitors_table.find_elements(By.TAG_NAME, "tr")
         element = competitors[index].find_element(By.CSS_SELECTOR, 'td.MGLFIQ-jd-a > div > div') 
 
-        # Attendre que l'élément soit visible et cliquable
         WebDriverWait(driver, 10).until(EC.visibility_of(element))
         WebDriverWait(driver, 10).until(EC.element_to_be_clickable(element))
-
-        # Faire défiler l'élément dans la vue si nécessaire
         driver.execute_script("arguments[0].scrollIntoView(true);", element)
-
-        # Attendre que l'élément soit interactif
         WebDriverWait(driver, 5).until(EC.element_to_be_clickable(element))
 
-        # Désélectionner l'élément en le cliquant à nouveau si nécessaire
         actions = ActionChains(driver)
         actions.move_to_element(element).click().perform()
-        print(f"uncheck done")
 
     except Exception as e:
         print(f"Erreur lors de la désélection de l'élément de la ligne {index + 1} : {e}")
-
-
 
 # Fonction pour cliquer sur le bouton play/pause
 def toggle_play_pause():
@@ -74,6 +73,7 @@ def retrieve_position_data():
         except Exception as e:
             print(f"Erreur lors de l'accès ou du clic sur la cellule de la ligne {i + 1} : {str(e)}")
             continue  
+            
         time.sleep(1)
         canvas_elements = driver.find_elements(By.CSS_SELECTOR, '#googleMapsArea > div > div.gm-style > div:nth-child(1) > div:nth-child(2) > div > div:nth-child(3)> canvas')
 
@@ -106,7 +106,6 @@ def retrieve_position_data():
             except Exception as e:
                 print(f"Erreur lors de l'analyse d'un canvas : {e}")
 
-
         print(f"Nombre de canvas bateau : {len(filtered_canvas_elements)}")
         if filtered_canvas_elements:
             try:
@@ -130,16 +129,16 @@ def retrieve_position_data():
                 if name not in processed_names:
                     print(f"Nom : {name}, Position : {direction}")
                    
-                    #with open(f"{name}.txt", "a") as f:
-                      #  f.write(f"time : {date_text}, direction: {direction}, voile: {voile}, place: {place}, vitesse: {vitesse}, angle: {angle}, position_DMS: {position_DMS}, position_Decimal: {position_Decimal}\n")
+                    with open(f"{name}.txt", "a") as f:
+                        f.write(f"time : {date_text}, direction: {direction}, voile: {voile}, place: {place}, vitesse: {vitesse}, angle: {angle}, position_DMS: {position_DMS}, position_Decimal: {position_Decimal}\n")
 
-                    #processed_names.add(name)  
-                uncheck_button_fct(i)
+                    processed_names.add(name)  
+                cancel_button_fct()
 
             except Exception as e:
                 print(f"Erreur lors de la récupération des données : {e}")
         # Désélectionner l'élément après utilisation
-
+        uncheck_button_fct(i)
 
 # Clique sur le bouton "Plus d'options"
 more_options_button = WebDriverWait(driver, 20).until(

@@ -8,16 +8,14 @@ from selenium.webdriver.chrome.options import Options
 
 chrome_options = Options()
 chrome_options.add_argument('--ignore-certificate-errors')
-chrome_options.add_argument('--ignore-ssl-errors=yes')  
-chrome_options.add_argument('--allow-insecure-localhost')  
-chrome_options.add_argument('--headless')  
-chrome_options.add_argument('--window-size= 12000,1080')  
+chrome_options.add_argument('--ignore-ssl-errors=yes') 
+chrome_options.add_argument('--allow-insecure-localhost') 
 driver = webdriver.Chrome(options=chrome_options)
-
+driver = webdriver.Chrome() 
+driver.set_window_size(12000, 5000)
 driver.get('https://www.sapsailing.com/gwt/RaceBoard.html?regattaName=OSG2024TEV2023+-+Men%27s+Dinghy&raceName=ILCA+7+-+R1&leaderboardName=OSG2024TEV2023+-+Men%27s+Dinghy&leaderboardGroupId=83eb5c2a-d3ab-4e22-8422-1e4ab154ed34&eventId=b8220cee-9ec7-4640-b8d8-f40e079456d5&mode=PLAYER')
 
 time.sleep(5)
-
 
 def cancel_button_fct():
     try:
@@ -33,16 +31,16 @@ def uncheck_button_fct(index):
         competitors = competitors_table.find_elements(By.TAG_NAME, "tr")
         element = competitors[index].find_element(By.CSS_SELECTOR, 'td.MGLFIQ-jd-a > div > div') 
 
+        WebDriverWait(driver, 10).until(EC.visibility_of(element))
         WebDriverWait(driver, 10).until(EC.element_to_be_clickable(element))
+        driver.execute_script("arguments[0].scrollIntoView(true);", element)
+        WebDriverWait(driver, 5).until(EC.element_to_be_clickable(element))
 
-        # Désélectionner l'élément en le cliquant à nouveau si nécessaire
         actions = ActionChains(driver)
         actions.move_to_element(element).click().perform()
 
     except Exception as e:
         print(f"Erreur lors de la désélection de l'élément de la ligne {index + 1} : {e}")
-
-
 
 # Fonction pour cliquer sur le bouton play/pause
 def toggle_play_pause():
@@ -75,9 +73,11 @@ def retrieve_position_data():
         except Exception as e:
             print(f"Erreur lors de l'accès ou du clic sur la cellule de la ligne {i + 1} : {str(e)}")
             continue  
+
         time.sleep(1)
         canvas_elements = driver.find_elements(By.CSS_SELECTOR, '#googleMapsArea > div > div.gm-style > div:nth-child(1) > div:nth-child(2) > div > div:nth-child(3)> canvas')
 
+        # Liste filtrée des canvas
         filtered_canvas_elements = []
         for canvas in canvas_elements:
             try:
@@ -96,8 +96,8 @@ def retrieve_position_data():
                 z_index = style_values["zIndex"]
 
                 # Vérifier les dimensions et le z-index
-                if (canvas.get_attribute("width") == "37" and
-                    canvas.get_attribute("height") == "38" and
+                if (canvas. get_dom_attribute("width") == "37" and
+                    canvas. get_dom_attribute("height") == "38" and
                     style_width == "37px" and
                     style_height == "38px" and
                     z_index == "215"):
@@ -107,7 +107,6 @@ def retrieve_position_data():
                 print(f"Erreur lors de l'analyse d'un canvas : {e}")
 
         print(f"Nombre de canvas bateau : {len(filtered_canvas_elements)}")
-
         if filtered_canvas_elements:
             try:
                 # Vérifier que le canvas(bateau) est visible et cliquable
@@ -134,7 +133,6 @@ def retrieve_position_data():
                         f.write(f"time : {date_text}, direction: {direction}, voile: {voile}, place: {place}, vitesse: {vitesse}, angle: {angle}, position_DMS: {position_DMS}, position_Decimal: {position_Decimal}\n")
 
                     processed_names.add(name)  
-
                 cancel_button_fct()
 
             except Exception as e:
@@ -142,13 +140,18 @@ def retrieve_position_data():
         # Désélectionner l'élément après utilisation
         uncheck_button_fct(i)
 
-
 # Clique sur le bouton "Plus d'options"
 more_options_button = WebDriverWait(driver, 20).until(
     EC.element_to_be_clickable((By.CSS_SELECTOR, '[selenium-id="moreOptionsButton"]'))
 )
 more_options_button.click()
 
+# Clique sur le bouton "zoomOut"
+zoomOut_button = WebDriverWait(driver, 20).until(
+    EC.element_to_be_clickable((By.CSS_SELECTOR, '[selenium-id="zoomOutButton"]'))
+)
+
+zoomOut_button.click()
 # Clique sur le bouton "settings"
 settings_button = WebDriverWait(driver, 20).until(
     EC.element_to_be_clickable((By.CSS_SELECTOR, '[selenium-id="raceMapSettingsButton"]'))
@@ -161,13 +164,29 @@ checkBox_button = WebDriverWait(driver, 20).until(
 )
 checkBox_button.click()
 
+# Uncheck l'aparition du tour de manoeuvre
+manoeuvreVirer_button = WebDriverWait(driver, 20).until(
+    EC.element_to_be_clickable((By.CSS_SELECTOR, '[id="gwt-uid-632"]'))
+)
+manoeuvreVirer_button.click()
+
+# Uncheck l'aparition du virer de manoeuvre
+manoeuvreTour_button = WebDriverWait(driver, 20).until(
+    EC.element_to_be_clickable((By.CSS_SELECTOR, '[id="gwt-uid-630"]'))
+)
+manoeuvreTour_button.click()
+
+# Uncheck l'aparition de changement d'amure de manoeuvre
+manoeuvreAmure_button = WebDriverWait(driver, 20).until(
+    EC.element_to_be_clickable((By.CSS_SELECTOR, '[id="gwt-uid-631"]'))
+)
+manoeuvreAmure_button.click()
 
 # Clique sur le bouton "done"
 done_button = WebDriverWait(driver, 20).until(
     EC.element_to_be_clickable((By.CSS_SELECTOR, '[selenium-id="OkButton"]'))
 )
 done_button.click()
-
 
 # Gestion du bouton "TimePanel-ShowExtended"
 appeareDate_clicked = False
@@ -188,7 +207,7 @@ size = sub_element.size
 w = size['width']
 action = ActionChains(driver)
 # placer le curseur sur la position voulu dans le timeLine
-action.move_to_element_with_offset(sub_element, -1*w/2 + 4540, 0).click().perform()
+action.move_to_element_with_offset(sub_element, -1*w/2 + 700, 0).click().perform()
 
 # Attendre que le tableau des concurrents soit présent
 competitors_table = WebDriverWait(driver, 10).until(
