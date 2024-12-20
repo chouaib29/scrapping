@@ -164,20 +164,20 @@ checkBox_button = WebDriverWait(driver, 20).until(
 checkBox_button.click()
 
 # Uncheck l'aparition du tour de manoeuvre
-manoeuvreTour_button = WebDriverWait(driver, 20).until(
-    EC.element_to_be_clickable((By.CSS_SELECTOR, '[id="gwt-uid-204"]'))
-)
-manoeuvreTour_button.click()
-
-# Uncheck l'aparition du virer de manoeuvre
 manoeuvreVirer_button = WebDriverWait(driver, 20).until(
-    EC.element_to_be_clickable((By.CSS_SELECTOR, '[id="gwt-uid-202"]'))
+    EC.element_to_be_clickable((By.XPATH, '//label[text()="Tour de pénalité"]/preceding-sibling::input[@type="checkbox"]'))
 )
 manoeuvreVirer_button.click()
 
+# Uncheck l'aparition du virer de manoeuvre
+manoeuvreTour_button = WebDriverWait(driver, 20).until(
+    EC.element_to_be_clickable((By.XPATH, '//label[text()="Virer"]/preceding-sibling::input[@type="checkbox"]'))
+)
+manoeuvreTour_button.click()
+
 # Uncheck l'aparition de changement d'amure de manoeuvre
 manoeuvreAmure_button = WebDriverWait(driver, 20).until(
-    EC.element_to_be_clickable((By.CSS_SELECTOR, '[id="gwt-uid-203"]'))
+    EC.element_to_be_clickable((By.XPATH, '//label[text()="Changement d\'amure"]/preceding-sibling::input[@type="checkbox"]'))
 )
 manoeuvreAmure_button.click()
 
@@ -186,7 +186,6 @@ done_button = WebDriverWait(driver, 20).until(
     EC.element_to_be_clickable((By.CSS_SELECTOR, '[selenium-id="OkButton"]'))
 )
 done_button.click()
-
 
 # Gestion du bouton "TimePanel-ShowExtended"
 appeareDate_clicked = False
@@ -215,8 +214,6 @@ competitors_table = WebDriverWait(driver, 10).until(
 )
 #boucler sur la duré de la regate (50min) avec 30 sec avant leur debut  
 for _ in range(3030):  
-    toggle_play_pause()  
-    toggle_play_pause()  
     retrieve_position_data()  
     toggle_play_pause() 
     time.sleep(1) 

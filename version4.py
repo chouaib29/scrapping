@@ -166,19 +166,19 @@ checkBox_button.click()
 
 # Uncheck l'aparition du tour de manoeuvre
 manoeuvreVirer_button = WebDriverWait(driver, 20).until(
-    EC.element_to_be_clickable((By.CSS_SELECTOR, '[id="gwt-uid-632"]'))
+    EC.element_to_be_clickable((By.XPATH, '//label[text()="Tour de pénalité"]/preceding-sibling::input[@type="checkbox"]'))
 )
 manoeuvreVirer_button.click()
 
 # Uncheck l'aparition du virer de manoeuvre
 manoeuvreTour_button = WebDriverWait(driver, 20).until(
-    EC.element_to_be_clickable((By.CSS_SELECTOR, '[id="gwt-uid-630"]'))
+    EC.element_to_be_clickable((By.XPATH, '//label[text()="Virer"]/preceding-sibling::input[@type="checkbox"]'))
 )
 manoeuvreTour_button.click()
 
 # Uncheck l'aparition de changement d'amure de manoeuvre
 manoeuvreAmure_button = WebDriverWait(driver, 20).until(
-    EC.element_to_be_clickable((By.CSS_SELECTOR, '[id="gwt-uid-631"]'))
+    EC.element_to_be_clickable((By.XPATH, '//label[text()="Changement d\'amure"]/preceding-sibling::input[@type="checkbox"]'))
 )
 manoeuvreAmure_button.click()
 
