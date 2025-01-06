@@ -132,8 +132,8 @@ def retrieve_position_data():
                     with open(f"{name}.txt", "a") as f:
                         f.write(f"time : {date_text}, direction: {direction}, voile: {voile}, place: {place}, vitesse: {vitesse}, angle: {angle}, position_DMS: {position_DMS}, position_Decimal: {position_Decimal}\n")
 
-                    processed_names.add(name)
-                #ajouter le sleep pour eviter le probleme de de uncheck qui ne fonctionne pas   
+                    processed_names.add(name)  
+
                 time.sleep(1)
                 cancel_button_fct()
 
@@ -168,19 +168,19 @@ checkBox_button.click()
 
 # Uncheck l'aparition du tour de manoeuvre
 manoeuvreVirer_button = WebDriverWait(driver, 20).until(
-    EC.element_to_be_clickable((By.XPATH, '//label[text()="Tour de pénalité"]/preceding-sibling::input[@type="checkbox"]'))
+    EC.element_to_be_clickable((By.CSS_SELECTOR, '[id="gwt-uid-632"]'))
 )
 manoeuvreVirer_button.click()
 
 # Uncheck l'aparition du virer de manoeuvre
 manoeuvreTour_button = WebDriverWait(driver, 20).until(
-    EC.element_to_be_clickable((By.XPATH, '//label[text()="Virer"]/preceding-sibling::input[@type="checkbox"]'))
+    EC.element_to_be_clickable((By.CSS_SELECTOR, '[id="gwt-uid-630"]'))
 )
 manoeuvreTour_button.click()
 
 # Uncheck l'aparition de changement d'amure de manoeuvre
 manoeuvreAmure_button = WebDriverWait(driver, 20).until(
-    EC.element_to_be_clickable((By.XPATH, '//label[text()="Changement d\'amure"]/preceding-sibling::input[@type="checkbox"]'))
+    EC.element_to_be_clickable((By.CSS_SELECTOR, '[id="gwt-uid-631"]'))
 )
 manoeuvreAmure_button.click()
 
@@ -209,7 +209,7 @@ size = sub_element.size
 w = size['width']
 action = ActionChains(driver)
 # placer le curseur sur la position voulu dans le timeLine
-action.move_to_element_with_offset(sub_element, -1*w/2 + 735, 0).click().perform()
+action.move_to_element_with_offset(sub_element, -1*w/2 + 1480, 0).click().perform()
 
 # Attendre que le tableau des concurrents soit présent
 competitors_table = WebDriverWait(driver, 10).until(
