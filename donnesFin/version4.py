@@ -13,7 +13,7 @@ chrome_options.add_argument('--allow-insecure-localhost')
 driver = webdriver.Chrome(options=chrome_options)
 driver = webdriver.Chrome() 
 driver.set_window_size(12000, 5000)
-driver.get('https://www.sapsailing.com/gwt/RaceBoard.html?regattaName=OSG2024TEV2023+-+Men%27s+Dinghy&raceName=ILCA+7+-+R2&leaderboardName=OSG2024TEV2023+-+Men%27s+Dinghy&leaderboardGroupId=83eb5c2a-d3ab-4e22-8422-1e4ab154ed34&eventId=b8220cee-9ec7-4640-b8d8-f40e079456d5&rm.buoyZoneRadiusInMeters=12.57&rm.zoomSettings.typesToConsiderOnZoom.removed=BUOYS&lb.raceDetailsToShow.removed=RACE_DISPLAY_BOATS&lb.overallDetailsToShow.removed=REGATTA_RANK&lb.delayBetweenAutoAdvancesInMilliseconds=1000&t=2896&autoExpandPreSelectedRace=true')
+driver.get('https://www.sapsailing.com/gwt/RaceBoard.html?regattaName=OSG2024TEV2023+-+Men%27s+Dinghy&raceName=ILCA+7+-+R1&leaderboardName=OSG2024TEV2023+-+Men%27s+Dinghy&leaderboardGroupId=83eb5c2a-d3ab-4e22-8422-1e4ab154ed34&eventId=b8220cee-9ec7-4640-b8d8-f40e079456d5&mode=PLAYER')
 
 time.sleep(5)
 
@@ -73,7 +73,8 @@ def retrieve_position_data():
         except Exception as e:
             print(f"Erreur lors de l'accès ou du clic sur la cellule de la ligne {i + 1} : {str(e)}")
             continue  
-            
+
+        #time.sleep(1)
         canvas_elements = driver.find_elements(By.CSS_SELECTOR, '#googleMapsArea > div > div.gm-style > div:nth-child(1) > div:nth-child(2) > div > div:nth-child(3)> canvas')
 
         # Liste filtrée des canvas
@@ -115,7 +116,6 @@ def retrieve_position_data():
                 # Simuler un clic sur le canvas
                 actions = ActionChains(driver)
                 actions.move_to_element(filtered_canvas_elements[0]).click().perform()
-
                 #recuperer les données voulu
                 name = driver.find_element(By.CSS_SELECTOR, "#googleMapsArea > div > div.gm-style > div:nth-child(1) > div:nth-child(2) > div > div:nth-child(4) > div > div > div > div.gm-style-iw.gm-style-iw-c > div.gm-style-iw-d > div > table > tbody > tr:nth-child(1) > td > div > div:nth-child(2)").text
                 voile = driver.find_element(By.CSS_SELECTOR, "#googleMapsArea > div > div.gm-style > div:nth-child(1) > div:nth-child(2) > div > div:nth-child(4) > div > div > div > div.gm-style-iw.gm-style-iw-c > div.gm-style-iw-d > div > table > tbody > tr:nth-child(2) > td > div > div:nth-child(2)").text
@@ -125,16 +125,16 @@ def retrieve_position_data():
                 angle = driver.find_element(By.CSS_SELECTOR, "#googleMapsArea > div > div.gm-style > div:nth-child(1) > div:nth-child(2) > div > div:nth-child(4) > div > div > div > div.gm-style-iw.gm-style-iw-c > div.gm-style-iw-d > div > table > tbody > tr:nth-child(6) > td > div > div:nth-child(2)").text
                 position_DMS = driver.find_element(By.CSS_SELECTOR, "#googleMapsArea > div > div.gm-style > div:nth-child(1) > div:nth-child(2) > div > div:nth-child(4) > div > div > div > div.gm-style-iw.gm-style-iw-c > div.gm-style-iw-d > div > table > tbody > tr:nth-child(7) > td > div > div:nth-child(2)").text
                 position_Decimal = driver.find_element(By.CSS_SELECTOR, "#googleMapsArea > div > div.gm-style > div:nth-child(1) > div:nth-child(2) > div > div:nth-child(4) > div > div > div > div.gm-style-iw.gm-style-iw-c > div.gm-style-iw-d > div > table > tbody > tr:nth-child(8) > td > div > div:nth-child(2)").text
-                #pour ne pas ajouter les infos d'un joueur plusieurs fois dans la meme instant
+
                 if name not in processed_names:
                     print(f"Nom : {name}, Position : {direction}")
-
+                   
                     with open(f"{name}.txt", "a") as f:
                         f.write(f"time : {date_text}, direction: {direction}, voile: {voile}, place: {place}, vitesse: {vitesse}, angle: {angle}, position_DMS: {position_DMS}, position_Decimal: {position_Decimal}\n")
 
                     processed_names.add(name)  
-                
-                time.sleep(2)
+
+                time.sleep(1)
                 cancel_button_fct()
 
             except Exception as e:
@@ -152,6 +152,7 @@ more_options_button.click()
 zoomOut_button = WebDriverWait(driver, 20).until(
     EC.element_to_be_clickable((By.CSS_SELECTOR, '[selenium-id="zoomOutButton"]'))
 )
+
 zoomOut_button.click()
 # Clique sur le bouton "settings"
 settings_button = WebDriverWait(driver, 20).until(
@@ -167,19 +168,19 @@ checkBox_button.click()
 
 # Uncheck l'aparition du tour de manoeuvre
 manoeuvreVirer_button = WebDriverWait(driver, 20).until(
-    EC.element_to_be_clickable((By.XPATH, '//label[text()="Tour de pénalité"]/preceding-sibling::input[@type="checkbox"]'))
+    EC.element_to_be_clickable((By.CSS_SELECTOR, '[id="gwt-uid-632"]'))
 )
 manoeuvreVirer_button.click()
 
 # Uncheck l'aparition du virer de manoeuvre
 manoeuvreTour_button = WebDriverWait(driver, 20).until(
-    EC.element_to_be_clickable((By.XPATH, '//label[text()="Virer"]/preceding-sibling::input[@type="checkbox"]'))
+    EC.element_to_be_clickable((By.CSS_SELECTOR, '[id="gwt-uid-630"]'))
 )
 manoeuvreTour_button.click()
 
 # Uncheck l'aparition de changement d'amure de manoeuvre
 manoeuvreAmure_button = WebDriverWait(driver, 20).until(
-    EC.element_to_be_clickable((By.XPATH, '//label[text()="Changement d\'amure"]/preceding-sibling::input[@type="checkbox"]'))
+    EC.element_to_be_clickable((By.CSS_SELECTOR, '[id="gwt-uid-631"]'))
 )
 manoeuvreAmure_button.click()
 
@@ -208,7 +209,7 @@ size = sub_element.size
 w = size['width']
 action = ActionChains(driver)
 # placer le curseur sur la position voulu dans le timeLine
-action.move_to_element_with_offset(sub_element, -1*w/2 + 500, 0).click().perform()
+action.move_to_element_with_offset(sub_element, -1*w/2 + 1480, 0).click().perform()
 
 # Attendre que le tableau des concurrents soit présent
 competitors_table = WebDriverWait(driver, 10).until(
@@ -216,9 +217,11 @@ competitors_table = WebDriverWait(driver, 10).until(
 )
 #boucler sur la duré de la regate (50min) avec 30 sec avant leur debut  
 for _ in range(3030):  
+    toggle_play_pause()  
+    time.sleep(1)  
     retrieve_position_data()  
+    time.sleep(2)  
     toggle_play_pause() 
     time.sleep(1) 
-    toggle_play_pause() 
 
 driver.quit()

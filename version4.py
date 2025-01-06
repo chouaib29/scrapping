@@ -59,7 +59,7 @@ def retrieve_position_data():
     element_date = driver.find_element(By.CSS_SELECTOR, ".timeLabel")
     date_text = element_date.text
     print(f"Date récupérée : {date_text}")
-    time.sleep(1)
+    #time.sleep(1)
 
     for i in range(len(competitors)):
         try:
@@ -74,7 +74,7 @@ def retrieve_position_data():
             print(f"Erreur lors de l'accès ou du clic sur la cellule de la ligne {i + 1} : {str(e)}")
             continue  
 
-        time.sleep(1)
+        #time.sleep(1)
         canvas_elements = driver.find_elements(By.CSS_SELECTOR, '#googleMapsArea > div > div.gm-style > div:nth-child(1) > div:nth-child(2) > div > div:nth-child(3)> canvas')
 
         # Liste filtrée des canvas
@@ -132,7 +132,9 @@ def retrieve_position_data():
                     with open(f"{name}.txt", "a") as f:
                         f.write(f"time : {date_text}, direction: {direction}, voile: {voile}, place: {place}, vitesse: {vitesse}, angle: {angle}, position_DMS: {position_DMS}, position_Decimal: {position_Decimal}\n")
 
-                    processed_names.add(name)  
+                    processed_names.add(name)
+                #ajouter le sleep pour eviter le probleme de de uncheck qui ne fonctionne pas   
+                time.sleep(1)
                 cancel_button_fct()
 
             except Exception as e:
@@ -207,7 +209,7 @@ size = sub_element.size
 w = size['width']
 action = ActionChains(driver)
 # placer le curseur sur la position voulu dans le timeLine
-action.move_to_element_with_offset(sub_element, -1*w/2 + 700, 0).click().perform()
+action.move_to_element_with_offset(sub_element, -1*w/2 + 735, 0).click().perform()
 
 # Attendre que le tableau des concurrents soit présent
 competitors_table = WebDriverWait(driver, 10).until(
